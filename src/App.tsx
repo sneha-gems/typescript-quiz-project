@@ -27,7 +27,7 @@ function App() {
       return result
     }
     data()
-  }, [])
+  }, [quizeQue])
 
   if(gameOver){
     return (
@@ -48,7 +48,10 @@ function App() {
   return (
     <div className="App">
       <h1>REACT QUIZ</h1>
+      { !stateQues && (
       <button onClick={() => dispatch({type:ReducerActionType.START_GAME, payload: {questions: questions } })}>Start</button>
+
+      ) }
       <p>Score: {score ? score : '0'}</p>
       {stateQues && !gameOver && (
         <>
