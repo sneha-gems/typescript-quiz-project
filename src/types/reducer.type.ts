@@ -1,7 +1,7 @@
 export enum ReducerActionType {
     NEXT_QUE,
-    PRE_QUE,
-    SET_ANS,
+    START_GAME,
+    CHECK_ANS,
     SET_SCORE,
     SET_LOAD
 }

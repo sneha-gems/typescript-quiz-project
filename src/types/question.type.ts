@@ -1,8 +1,10 @@
+import { AnswerObject } from "./answer.type"
+
 export type questionProps = {
     question?: string,
     answers?: string[],
     callBack?: any,
-    userAnswer?: boolean,
+    userAnswer?: AnswerObject | undefined,
     questionNo?: number,
     totalQuestion?: number
 

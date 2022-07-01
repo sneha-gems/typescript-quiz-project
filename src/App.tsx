@@ -1,53 +1,43 @@
-import { useState } from 'react';
+import { useEffect, useReducer, useState } from 'react';
 
 import Api from './Api';
 import './App.css';
 import Question from './components/Question';
+import { reducer } from './components/reducer';
 import { buttonEvent } from './types/button.type';
 import { QuestionState } from './types/question.type';
+import { ReducerActionType } from './types/reducer.type';
+import { initialState, TOTAL_QUES } from './utils';
 
 function App() {
-  const {quizeQue} = Api()
-  const [loading, setLoading] = useState(false)
+  const {quizeQue}= Api()
   const [questions, setQuestions] = useState<QuestionState[]>([])
-  const [number, setNumber] = useState(0)
-  const [userAnswer, setUserAnswer] = useState(false)
-  const [score, setScore] = useState(0)
-  const [gameOver, setGameOver] = useState(true)
-  
+  const [state, dispatch]= useReducer(reducer, initialState!)
+  const {loading, gameOver, stateQues, number, score, message} = state
 
-  // const initialState:questionProps = {
-  //   question: "Test question",
-  //   answers: ["true", "false"],
-  //   callBack: "",
-  //   userAnswer: false,
-  //   questionNo: 1,
-  //   totalQuestion: 10
-  // }
-  // const [state, dispatch]= useReducer(reducer, initialState!)
-
-  const startTriv = async () => {
-    setLoading(true)
-    setGameOver(false)
-    const questions = await quizeQue()
-    setQuestions(questions)
-    setLoading(false)
+  const handleRefresh = () => {
+    window.location.reload()
   }
 
-  const checkAns = (e: buttonEvent) => {
-if(e.currentTarget.value === questions[number]?.correct_answer){
-  setScore(score + 1)
-  alert("User Answer is right")
-  setNumber(number +1)
-  return true
-}else{
-  alert("User Answer is Wrong")
-  return false
-}
-  }
 
-  const nextQue = (e: buttonEvent) => {
-    setNumber(number +1)
+  useEffect(() => {
+    const data = async () => {
+      const result = await quizeQue()
+      setQuestions(result)
+      return result
+    }
+    data()
+  }, [])
+
+  if(gameOver){
+    return (
+      <>
+      <h1>Score: {score}</h1>
+      <p>{message}</p>
+      <button onClick={handleRefresh}>Restart</button>
+
+      </>
+    )
   }
 
 
@@ -58,20 +48,21 @@ if(e.currentTarget.value === questions[number]?.correct_answer){
   return (
     <div className="App">
       <h1>REACT QUIZ</h1>
-      <button onClick={startTriv}>Start</button>
-      <p>Score: {score}</p>
-      {questions && !gameOver && (
+      <button onClick={() => dispatch({type:ReducerActionType.START_GAME, payload: {questions: questions } })}>Start</button>
+      <p>Score: {score ? score : '0'}</p>
+      {stateQues && !gameOver && (
         <>
       <Question
         key={number}
         questionNo={number +1}
-        question={questions[number]?.question}
-        answers= {questions[number]?.answers}
-        callBack={checkAns}
-        userAnswer={userAnswer ? userAnswer : false}
-        totalQuestion={10}
+        question={stateQues?.questions[number]?.question}
+        answers= {stateQues?.questions[number]?.answers}
+        callBack={(e: buttonEvent) => dispatch({type: ReducerActionType.CHECK_ANS, payload: {value: e.currentTarget.value }})}
+        userAnswer={undefined}
+        totalQuestion={TOTAL_QUES}
       />
-      <button onClick={nextQue}>Next Question</button> 
+      <p>{message}</p>
+      <button onClick={() => dispatch({type: ReducerActionType.NEXT_QUE, payload: {number: number+1}})}>Next Question</button> 
       </>
       )}
 

@@ -10,7 +10,7 @@ const Question: React.FC<questionProps> = ({question, answers, questionNo, callB
     <div>
         {answers!.map((answer, index) =>(
             <div key={index}>
-                <button disabled={userAnswer} onClick={callBack} value={answer}>
+                <button disabled={userAnswer ? true : false} onClick={callBack} value={answer}>
                     <span dangerouslySetInnerHTML={{__html: answer}} />
                 </button>
             </div>
